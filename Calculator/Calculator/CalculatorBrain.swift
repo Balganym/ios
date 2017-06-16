@@ -21,16 +21,31 @@ struct CalculatorBarain{
         case clear
     }
     
-    mutating func setHistory(){
-        
-        if resultsPending {
-            history.removeSubrange(history.index(history.endIndex, offsetBy: -4)..<history.endIndex)
+    mutating func setHistory(_ character: String){
+        if history == "0"{
+            history = ""
         }
-        else {
-            resultsPending = true
+        if history.contains("..."){
+            history.removeSubrange(history.index(history.endIndex, offsetBy: -3)..<history.endIndex)
+        }else if !resultsPending && history.hasSuffix("= "){
+            history = ""
+        }
+        if !resultsPending{
+            history += character
+            if character.hasSuffix(".0") {
+                history.removeSubrange(history.index(history.endIndex, offsetBy: -2)..<history.endIndex)
+            }
+            history += " "
+        }else{
+            history.removeSubrange(history.index(history.endIndex, offsetBy: -2)..<history.endIndex)
+            if !history.hasSuffix(") "){
+                history.remove(at: history.index(before: history.endIndex))
+                history = "(" + history + ") "
+            }
+            print(history)
+            history+=character + " "
         }
     }
-    
     
     private var operations: [String: Operation] = [
         "π": Operation.constant(Double.pi),
@@ -62,12 +77,12 @@ struct CalculatorBarain{
     private var pendingBO: PendingBinaryOperation?
     
     mutating func performOperation(_ symbol: String){
-        setHistory()
-        history += " " + symbol + "..."
         if let operation = operations[symbol] {
             switch operation {
             case .constant(let val):
                 accumulator = val
+                setHistory(symbol)
+                history+="..."
             case .unaryOperation(let function):
                 if accumulator == nil, pendingBO != nil {
                     accumulator = pendingBO?.firstOperand
@@ -75,6 +90,8 @@ struct CalculatorBarain{
                 if accumulator != nil{
                     accumulator = function(accumulator!)
                 }
+                setHistory(symbol)
+                history+="..."
             case .binaryOperation(let function):
                 if accumulator != nil {
                     pendingBO = PendingBinaryOperation(function: function,
@@ -82,41 +99,37 @@ struct CalculatorBarain{
                     accumulator = nil
                 }
                 pendingBO?.function = function
+                setHistory(symbol)
+                history+="..."
             case .result:
                 if pendingBO != nil, accumulator != nil {
+                    resultsPending = false
                     accumulator = pendingBO?.perform(with: accumulator!)
                     pendingBO = nil
-                    history.removeSubrange(history.index(history.endIndex, offsetBy: -3)..<history.endIndex)
-                    resultsPending = false
-                    history += " "
                 }
-                
+                setHistory(symbol)
             case .clear:
+                resultsPending = false
                 accumulator = 0
                 pendingBO = nil
-                history = ""
+                history = "0"
             }
+            resultsPending = true
         }
     }
     
     // Сетим наш счетчик
     mutating func setOperand(_ operand: Double){
-        if resultsPending {
-            history.removeSubrange(history.index(history.endIndex, offsetBy: -3)..<history.endIndex)
-        }else{
-            history = ""
-        }
         resultsPending = false
+        setHistory(String(operand))
         var currentOperand = String(operand)
         if currentOperand.hasSuffix(".0") {
             currentOperand.removeSubrange(currentOperand.index(currentOperand.endIndex, offsetBy: -2)..<currentOperand.endIndex)
         }
-        history = history == "0" ? currentOperand : history + " " + currentOperand
         accumulator = operand
     }
     
     var result: (Double?, String?) {
         return (accumulator, history)
     }
-    
 }
