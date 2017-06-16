@@ -5,7 +5,6 @@
 //  Created by mac on 13.06.17.
 //  Copyright © 2017 mac. All rights reserved.
 //
-
 import Foundation
 
 struct CalculatorBarain{
@@ -23,6 +22,7 @@ struct CalculatorBarain{
     }
     
     mutating func setHistory(){
+        
         if resultsPending {
             history.removeSubrange(history.index(history.endIndex, offsetBy: -4)..<history.endIndex)
         }
@@ -47,7 +47,7 @@ struct CalculatorBarain{
         "AC": Operation.clear,
         "rand": Operation.constant(Double(arc4random_uniform(100))/100),
         "=": Operation.result,
-    ]
+        ]
     
     // Выполнение бинарных операций
     private struct PendingBinaryOperation{
@@ -87,6 +87,7 @@ struct CalculatorBarain{
                     accumulator = pendingBO?.perform(with: accumulator!)
                     pendingBO = nil
                     history.removeSubrange(history.index(history.endIndex, offsetBy: -3)..<history.endIndex)
+                    resultsPending = false
                     history += " "
                 }
                 
@@ -101,7 +102,9 @@ struct CalculatorBarain{
     // Сетим наш счетчик
     mutating func setOperand(_ operand: Double){
         if resultsPending {
-             history.removeSubrange(history.index(history.endIndex, offsetBy: -3)..<history.endIndex)
+            history.removeSubrange(history.index(history.endIndex, offsetBy: -3)..<history.endIndex)
+        }else{
+            history = ""
         }
         resultsPending = false
         var currentOperand = String(operand)

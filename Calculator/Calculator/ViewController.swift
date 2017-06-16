@@ -5,16 +5,14 @@
 //  Created by mac on 13.06.17.
 //  Copyright © 2017 mac. All rights reserved.
 //
-
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     @IBOutlet weak var display: UILabel?
     @IBOutlet weak var historyDisplay: UILabel!
     
     var userInTheMiddleOfTyping = false
-    var pointExist = false
     
     //Вывод на дисплей
     var displayValue: Double {
@@ -31,16 +29,13 @@ class ViewController: UIViewController {
     
     //Проверка ввода/вывода числа с плавающей точкой
     @IBAction func setFloatingPoint(_ sender: UIButton) {
-        if !pointExist, userInTheMiddleOfTyping{
+        if !display!.text!.contains("."), userInTheMiddleOfTyping{
             display!.text! += sender.currentTitle!
-            pointExist = true
-            userInTheMiddleOfTyping = true
         }
         else{
             display!.text! = "0" + sender.currentTitle!
-            pointExist = true
-            userInTheMiddleOfTyping = true
         }
+        userInTheMiddleOfTyping = true
     }
     
     //Ввод числа
@@ -52,7 +47,6 @@ class ViewController: UIViewController {
         }else{
             display!.text = digit
             userInTheMiddleOfTyping = true
-            pointExist = false
         }
     }
     
@@ -76,4 +70,3 @@ class ViewController: UIViewController {
         
     }
 }
-
