@@ -32,7 +32,7 @@ class ViewController: UIViewController {
         if !display!.text!.contains("."), userInTheMiddleOfTyping{
             display!.text! += sender.currentTitle!
         }
-        else{
+        else if !userInTheMiddleOfTyping, !display!.text!.contains("."){
             display!.text! = "0" + sender.currentTitle!
         }
         userInTheMiddleOfTyping = true
@@ -43,10 +43,14 @@ class ViewController: UIViewController {
         let digit = sender.currentTitle!
         if userInTheMiddleOfTyping{
             let textCurrentlyInDisplay = display!.text!
-            display!.text = textCurrentlyInDisplay + digit
-        }else{
+            if textCurrentlyInDisplay != "0"{
+                display!.text = textCurrentlyInDisplay + digit
+            }else{
+                display!.text = digit
+            }
+        }else if !userInTheMiddleOfTyping{
             display!.text = digit
-            userInTheMiddleOfTyping = true
+                userInTheMiddleOfTyping = true
         }
     }
     
@@ -65,8 +69,11 @@ class ViewController: UIViewController {
             displayValue = result
         }
         if let history = brain.result.1{
-            historyDisplay!.text! = history
+            if history == ""{
+                historyDisplay!.text! = "0"
+            }else{
+                historyDisplay!.text! = history
+            }
         }
-        
     }
 }
