@@ -10,32 +10,46 @@ import Foundation
 struct CalculatorBarain{
     
     private var accumulator: Double? = 0
+    private var accumulatorString: String? = ""
     private var resultIsPending = false
+    private var resultIsClicked = false
     private var history = [String]()
+    
+    func toString(_ number: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.maximumSignificantDigits = 5
+        return formatter.string(from: number as NSNumber)!
+    }
+    
+    mutating func setFalseAndSetAccumulatorString(_ addToHistory: String){
+        resultIsPending = false
+        resultIsClicked = false
+        accumulatorString = addToHistory
+    }
     
     private enum Operation {
         case constant(Double)
-        case unaryOperation((Double) -> Double)
+        case unaryOperation((Double,String) -> (Double, String))
         case binaryOperation((Double, Double) -> Double)
+        case random
         case result
         case clear
     }
-
+    
     private var operations: [String: Operation] = [
         "π": Operation.constant(Double.pi),
         "e": Operation.constant(M_E),
-        "√": Operation.unaryOperation(sqrt),
-        "cos": Operation.unaryOperation(cos),
-        "sin": Operation.unaryOperation(sin),
-        "+/-": Operation.unaryOperation {-$0},
-        "1/x": Operation.unaryOperation {1/$0},
-        "%": Operation.unaryOperation {$0/100},
+        "√": Operation.unaryOperation({(sqrt($0), "√(" + ($1) + ")")}),
+        "cos": Operation.unaryOperation {(cos($0), "cos(" + $1 + ")")},
+        "sin": Operation.unaryOperation {(sin($0), "sin(" + $1 + ")")},
+        "+/-": Operation.unaryOperation {(-$0, "-(" + $1 + ")")},
+        "1/x": Operation.unaryOperation {(1/$0, "1/(" + $1 + ")")},
         "+": Operation.binaryOperation(+),
         "-": Operation.binaryOperation(-),
         "x": Operation.binaryOperation(*),
         "/": Operation.binaryOperation(/),
+         "rand": Operation.random,
         "AC": Operation.clear,
-        "rand": Operation.constant(Double(arc4random_uniform(100))/100),
         "=": Operation.result,
     ]
     
@@ -54,38 +68,50 @@ struct CalculatorBarain{
         if let operation = operations[symbol] {
             switch operation {
             case .constant(let val):
-                if resultIsPending || history.count==0{
-                    accumulator = val
-                    history.append(symbol)
-                    resultIsPending = false
+                if !resultIsPending && history.count > 0{
+                    history.remove(at: history.count - 1)
                 }
+                accumulator = val
+                history.append(symbol)
+//                resultIsPending = false
+//                resultIsClicked = false
+//                accumulatorString = symbol
+                setFalseAndSetAccumulatorString(symbol)
             case .unaryOperation(let function):
+                if !resultIsPending, history.count > 0 {
+                    history.remove(at: history.count - 1)
+                }
                 if accumulator == nil, pendingBO != nil {
                     accumulator = pendingBO?.firstOperand
-//                    history.append(symbol)
-                    history.append(String(describing: accumulator))
+                    if accumulatorString == "" {
+                        accumulatorString = toString(accumulator!)
+                    }
                 }
                 if accumulator != nil{
-                    accumulator = function(accumulator!)
-                    if history.count > 0, (history[history.count-1] != "="){
-                        history.insert(symbol, at: history.count-1)
-                        history.insert("(", at: history.count-1)
-                        history.append(")")
-                    }else if history.count > 0, history[history.count-1] == "="  || history.count == 0 {
-                        history.insert("(", at: 0)
-                        history.insert(symbol, at: 0)
-                        history.insert(")", at: history.count-1)
+                    if accumulatorString == ""{
+                        accumulatorString = toString(accumulator!)
+                    }else if history.count>0, accumulatorString == history[history.count - 1]{
+                        history.remove(at: history.count - 1)
                     }
+                    let result = function(accumulator!, accumulatorString!)
+                    accumulator = result.0
+                    accumulatorString = result.1
+                    history.append(accumulatorString!)
                 }
                 resultIsPending = false
             case .binaryOperation(let function):
-                if resultIsPending || (history.count>0 && history[history.count-1] == "=") {
-                    history.remove(at: history.count-1)
+                resultIsClicked = false
+                if resultIsPending {
+                    history.remove(at: history.count - 1)
                 }
+                accumulatorString = history.joined(separator: " ")
                 if history.count == 0{
                     history.append("0")
                 }
                 if history.count>2, (symbol == "x" || symbol == "/"), history[history.count-1] != ")"{
+                    accumulatorString = history.joined(separator: " ")
+                    history.removeAll()
+                    history.append(accumulatorString!)
                     history.insert("(", at: 0)
                     history.append(")")
                 }
@@ -97,45 +123,66 @@ struct CalculatorBarain{
                 pendingBO?.function = function
                 resultIsPending = true
                 history.append(symbol)
+            case .random:
+                accumulator = (Double(arc4random_uniform(101)) / 100.0)
+//                accumulatorString = toString(accumulator!)
+                setFalseAndSetAccumulatorString(toString(accumulator!))
+                if !resultIsPending && history.count > 0{
+                    history.remove(at: history.count - 1)
+                }
+                history.append(accumulatorString!)
+//                resultIsPending = false
+//                resultIsClicked = false
             case .result:
                 if pendingBO != nil, accumulator != nil {
+                    resultIsClicked = true
+                    resultIsPending = false
                     if !resultIsPending {
-                        history.append(symbol)
+                        accumulatorString = history.joined(separator: " ")
+                        history.removeAll()
+                        history.append(accumulatorString!)
                     }
                     accumulator = pendingBO?.perform(with: accumulator!)
                     pendingBO = nil
                 }else if accumulator == nil {
+                    resultIsClicked = true
                     if !resultIsPending{
-                        history.append(symbol)
+                        accumulatorString = history.joined(separator: " ")
+                        history.removeAll()
+                        history.append(accumulatorString!)
                     }
                 }
             case .clear:
-                resultIsPending = false
+//                resultIsClicked = false
+//                resultIsPending = false
                 accumulator = 0
                 pendingBO = nil
                 history.removeAll()
+//                accumulatorString = ""
+                setFalseAndSetAccumulatorString("")
             }
         }
     }
     
-    // Сетим наш счетчик
+    // закачиваем операнд в модельку
     mutating func setOperand(_ operand: Double){
-        if history.count > 0, history[history.count-1] == "="{
+        if resultIsClicked{
             history.removeAll()
+            pendingBO = nil
         }
-        resultIsPending = false
-        var currentOperand = String(operand)
-        if currentOperand.hasSuffix(".0") {
-            currentOperand.removeSubrange(currentOperand.index(currentOperand.endIndex, offsetBy: -2)..<currentOperand.endIndex)
-        }
-        history.append(currentOperand)
+        setFalseAndSetAccumulatorString(toString(operand))
+//        resultIsClicked = false
+//        resultIsPending = false
+//        accumulatorString = toString(operand)
+        history.append(accumulatorString!)
         accumulator = operand
     }
     
     var result: (Double?, String?) {
-        if resultIsPending {
+        if resultIsPending{
             return (accumulator, history.joined(separator: " ") + "...")
-
+        }else if resultIsClicked {
+            return (accumulator, history.joined(separator: " ") + " =")
         }
         return (accumulator, history.joined(separator: " "))
     }

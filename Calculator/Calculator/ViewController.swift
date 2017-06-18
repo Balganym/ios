@@ -17,14 +17,7 @@ class ViewController: UIViewController {
     //Вывод на дисплей
     var displayValue: Double {
         get {return Double(display!.text!)!}
-        set {
-            var curValue = String(newValue)
-            print(userInTheMiddleOfTyping)
-            if curValue.hasSuffix(".0") {
-                curValue.removeSubrange(curValue.index(curValue.endIndex, offsetBy: -2)..<curValue.endIndex)
-            }
-            display!.text = curValue
-        }
+        set {display!.text = brain.toString(newValue)}
     }
     
     //Проверка ввода/вывода числа с плавающей точкой
@@ -32,8 +25,8 @@ class ViewController: UIViewController {
         if !display!.text!.contains("."), userInTheMiddleOfTyping{
             display!.text! += sender.currentTitle!
         }
-        else if !userInTheMiddleOfTyping, !display!.text!.contains("."){
-            display!.text! = "0" + sender.currentTitle!
+        else if !userInTheMiddleOfTyping{
+            display!.text! = "0."
         }
         userInTheMiddleOfTyping = true
     }
