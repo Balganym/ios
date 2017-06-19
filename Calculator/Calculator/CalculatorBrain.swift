@@ -15,12 +15,14 @@ struct CalculatorBarain{
     private var resultIsClicked = false
     private var history = [String]()
     
+    // Преобразование числа в строку
     func toString(_ number: Double) -> String {
         let formatter = NumberFormatter()
-        formatter.maximumSignificantDigits = 5
+        formatter.maximumSignificantDigits = 6
         return formatter.string(from: number as NSNumber)!
     }
     
+    // очень часто используемая запись в кейсах (просто, чтобы каждый раз не писать одно и то же)
     mutating func setFalseAndSetAccumulatorString(_ addToHistory: String){
         resultIsPending = false
         resultIsClicked = false
@@ -42,13 +44,18 @@ struct CalculatorBarain{
         "√": Operation.unaryOperation({(sqrt($0), "√(" + ($1) + ")")}),
         "cos": Operation.unaryOperation {(cos($0), "cos(" + $1 + ")")},
         "sin": Operation.unaryOperation {(sin($0), "sin(" + $1 + ")")},
-        "+/-": Operation.unaryOperation {(-$0, "-(" + $1 + ")")},
+        "tan": Operation.unaryOperation {(tan($0), "tan(" + $1 + ")")},
+        "ln": Operation.unaryOperation {(log($0), "ln(" + $1 + ")")},
+        "%": Operation.unaryOperation {(($0/100), "(" + $1 + "/100)")},
+        "±": Operation.unaryOperation {(-$0, "-(" + $1 + ")")},
+        "x^2": Operation.unaryOperation {($0 * $0, "(" + $1 + ")^2")},
+        "x^3": Operation.unaryOperation {($0 * $0 * $0, "(" + $1 + ")^3")},
         "1/x": Operation.unaryOperation {(1/$0, "1/(" + $1 + ")")},
         "+": Operation.binaryOperation(+),
         "-": Operation.binaryOperation(-),
-        "x": Operation.binaryOperation(*),
+        "×": Operation.binaryOperation(*),
         "/": Operation.binaryOperation(/),
-         "rand": Operation.random,
+        "rand": Operation.random,
         "AC": Operation.clear,
         "=": Operation.result,
     ]
@@ -73,9 +80,6 @@ struct CalculatorBarain{
                 }
                 accumulator = val
                 history.append(symbol)
-//                resultIsPending = false
-//                resultIsClicked = false
-//                accumulatorString = symbol
                 setFalseAndSetAccumulatorString(symbol)
             case .unaryOperation(let function):
                 if !resultIsPending, history.count > 0 {
@@ -108,7 +112,7 @@ struct CalculatorBarain{
                 if history.count == 0{
                     history.append("0")
                 }
-                if history.count>2, (symbol == "x" || symbol == "/"), history[history.count-1] != ")"{
+                if history.count>2, (symbol == "×" || symbol == "/"), history[history.count-1] != ")"{
                     accumulatorString = history.joined(separator: " ")
                     history.removeAll()
                     history.append(accumulatorString!)
@@ -125,14 +129,11 @@ struct CalculatorBarain{
                 history.append(symbol)
             case .random:
                 accumulator = (Double(arc4random_uniform(101)) / 100.0)
-//                accumulatorString = toString(accumulator!)
-                setFalseAndSetAccumulatorString(toString(accumulator!))
                 if !resultIsPending && history.count > 0{
                     history.remove(at: history.count - 1)
                 }
+                setFalseAndSetAccumulatorString(toString(accumulator!))
                 history.append(accumulatorString!)
-//                resultIsPending = false
-//                resultIsClicked = false
             case .result:
                 if pendingBO != nil, accumulator != nil {
                     resultIsClicked = true
@@ -153,31 +154,26 @@ struct CalculatorBarain{
                     }
                 }
             case .clear:
-//                resultIsClicked = false
-//                resultIsPending = false
                 accumulator = 0
                 pendingBO = nil
                 history.removeAll()
-//                accumulatorString = ""
                 setFalseAndSetAccumulatorString("")
             }
         }
     }
     
-    // закачиваем операнд в модельку
+    // закачивание операнда в модельку
     mutating func setOperand(_ operand: Double){
-        if resultIsClicked{
+        if resultIsClicked || (!resultIsPending && history.count != 0){
             history.removeAll()
             pendingBO = nil
         }
         setFalseAndSetAccumulatorString(toString(operand))
-//        resultIsClicked = false
-//        resultIsPending = false
-//        accumulatorString = toString(operand)
         history.append(accumulatorString!)
         accumulator = operand
     }
     
+    // возвращаем результат и историю
     var result: (Double?, String?) {
         if resultIsPending{
             return (accumulator, history.joined(separator: " ") + "...")

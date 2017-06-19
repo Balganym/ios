@@ -10,7 +10,7 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var display: UILabel?
-    @IBOutlet weak var historyDisplay: UILabel!
+    @IBOutlet weak var historyDisplay: UILabel?
     
     var userInTheMiddleOfTyping = false
     
@@ -63,7 +63,7 @@ class ViewController: UIViewController {
         }
         if let history = brain.result.1{
             if history == ""{
-                historyDisplay!.text! = "0"
+                historyDisplay!.text! = " "
             }else{
                 historyDisplay!.text! = history
             }
