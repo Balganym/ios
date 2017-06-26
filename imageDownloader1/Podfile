@@ -1,0 +1,6 @@
+use_frameworks!
+platform :ios, '9.0'
+
+target 'imageDownloader1' do
+  pod 'AlamofireImage', '~> 3.2'
+end

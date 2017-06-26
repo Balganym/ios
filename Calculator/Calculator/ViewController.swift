@@ -9,24 +9,23 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var display: UILabel?
-    @IBOutlet weak var historyDisplay: UILabel?
+    @IBOutlet weak var display: UILabel!
+    @IBOutlet weak var historyDisplay: UILabel!
     
     var userInTheMiddleOfTyping = false
     
     //Вывод на дисплей
     var displayValue: Double {
-        get {return Double(display!.text!)!}
-        set {display!.text = brain.toString(newValue)}
+        get {return Double(display.text!)!}
+        set {display.text = brain.toString(newValue)}
     }
     
     //Проверка ввода/вывода числа с плавающей точкой
     @IBAction func setFloatingPoint(_ sender: UIButton) {
-        if !display!.text!.contains("."), userInTheMiddleOfTyping{
-            display!.text! += sender.currentTitle!
-        }
-        else if !userInTheMiddleOfTyping{
-            display!.text! = "0."
+        if !display.text!.contains("."), userInTheMiddleOfTyping{
+            display.text! += sender.currentTitle!
+        } else if !userInTheMiddleOfTyping{
+            display.text! = "0."
         }
         userInTheMiddleOfTyping = true
     }
@@ -35,18 +34,17 @@ class ViewController: UIViewController {
     @IBAction func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         if userInTheMiddleOfTyping{
-            let textCurrentlyInDisplay = display!.text!
+            let textCurrentlyInDisplay = display.text!
             if textCurrentlyInDisplay != "0"{
-                display!.text = textCurrentlyInDisplay + digit
+                display.text = textCurrentlyInDisplay + digit
             }else{
-                display!.text = digit
+                display.text = digit
             }
         }else if !userInTheMiddleOfTyping{
-            display!.text = digit
-                userInTheMiddleOfTyping = true
+            display.text = digit
+            userInTheMiddleOfTyping = true
         }
     }
-    
     
     private var brain = CalculatorBarain()
     
@@ -58,14 +56,14 @@ class ViewController: UIViewController {
         if let mathematicalSymbol = sender.currentTitle{
             brain.performOperation(mathematicalSymbol);
         }
-        if let result = brain.result.0{
+        if let result = brain.result.value{
             displayValue = result
         }
-        if let history = brain.result.1{
-            if history == ""{
-                historyDisplay!.text! = " "
+        if let history = brain.result.history{
+            if history.isEmpty {
+                historyDisplay.text! = " "
             }else{
-                historyDisplay!.text! = history
+                historyDisplay.text! = history
             }
         }
     }

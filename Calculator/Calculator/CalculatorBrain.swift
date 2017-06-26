@@ -76,7 +76,7 @@ struct CalculatorBarain{
             switch operation {
             case .constant(let val):
                 if !resultIsPending && history.count > 0{
-                    history.remove(at: history.count - 1)
+                    history.removeLast()
                 }
                 accumulator = val
                 history.append(symbol)
@@ -91,7 +91,7 @@ struct CalculatorBarain{
                         accumulatorString = toString(accumulator!)
                     }
                 }
-                if accumulator != nil{
+                if accumulator != nil {
                     if accumulatorString == ""{
                         accumulatorString = toString(accumulator!)
                     }else if history.count>0, accumulatorString == history[history.count - 1]{
@@ -106,13 +106,13 @@ struct CalculatorBarain{
             case .binaryOperation(let function):
                 resultIsClicked = false
                 if resultIsPending {
-                    history.remove(at: history.count - 1)
+                    history.removeLast()
                 }
                 accumulatorString = history.joined(separator: " ")
                 if history.count == 0{
                     history.append("0")
                 }
-                if history.count>2, (symbol == "×" || symbol == "/"), history[history.count-1] != ")"{
+                if history.count>2, (symbol == "×" || symbol == "/"), history.last! != ")"{
                     accumulatorString = history.joined(separator: " ")
                     history.removeAll()
                     history.append(accumulatorString!)
@@ -174,7 +174,7 @@ struct CalculatorBarain{
     }
     
     // возвращаем результат и историю
-    var result: (Double?, String?) {
+    var result: (value: Double?, history: String?) {
         if resultIsPending{
             return (accumulator, history.joined(separator: " ") + "...")
         }else if resultIsClicked {

@@ -1,0 +1,18 @@
+PODS:
+  - Alamofire (4.5.0)
+  - IQKeyboardManagerSwift (4.0.10)
+  - NVActivityIndicatorView (3.6.1)
+
+DEPENDENCIES:
+  - Alamofire (~> 4.4)
+  - IQKeyboardManagerSwift
+  - NVActivityIndicatorView
+
+SPEC CHECKSUMS:
+  Alamofire: f28cdffd29de33a7bfa022cbd63ae95a27fae140
+  IQKeyboardManagerSwift: 75ba21a23794a1e6b6fe6d9a267ea17f80e06771
+  NVActivityIndicatorView: 9f52a7f84bf5c6a798722c450fe3c198e01c56ed
+
+PODFILE CHECKSUM: a43a86b5f99d6b169631e95164e843621841affe
+
+COCOAPODS: 1.2.1
