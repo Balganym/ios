@@ -6,8 +6,8 @@
 //  Copyright © 2017 mac. All rights reserved.
 //
 
-import Foundation
 import Alamofire
+import ObjectMapper
 
 // функуции будут видны для всех UIViewController'ов
 extension UIViewController {
@@ -27,19 +27,19 @@ extension UIViewController {
     }
 }
 
-struct User {
+struct User: Mappable {
     
-    var token = ""
     var id = 0
     var email = ""
+    var name = ""
+    var avatar = ""
     
-    // инициализация
-    init(from json: [String: Any]) {
-        token = json["token"] as! String
-        
-        var user = json["user"] as! [String: Any]
-        id = user["id"] as! Int
-        email = user["username"] as! String
+    init?(map: Map) { }
+    mutating func mapping(map: Map) {
+        id <- map["user.id"]
+        email <- map["user.email"]
+        name <- map["user.full_name"]
+        avatar <- map["user.avatar"]
     }
     
     // авторизация пользователя
@@ -55,12 +55,11 @@ struct User {
             switch response.result {
             case .success(let value):
                 let json = value as! [String: Any]
-                
+                print(json)
                 let code = json["code"] as! Int
                 switch code {
                 case 0:
-                    saveUser(json)
-                    completion(User(from: json), nil)
+                    completion(User(JSON: json)!, nil)
                 case 6:
                     completion(nil, "Пользователь с таким email не найден")
                 default:
@@ -72,17 +71,6 @@ struct User {
         }
     }
     
-    // сохранение пользователя в userDefaults
-    static func saveUser(_ userInfo: [String: Any?]) {
-        UserDefaults.standard.set(userInfo, forKey: "curUser")
-    }
-    
-    // удаление пользователя с userDefaults
-    static func deleteUser() {
-        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
-        UserDefaults.standard.synchronize()
-    }
-
     // валидация email
     static func isValidEmail(_ email: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"

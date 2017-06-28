@@ -9,6 +9,16 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>AlamofireImage.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Cache.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>IQKeyboardManagerSwift.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -19,7 +29,17 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>ObjectMapper.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-Authorization.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>SwiftHash.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -32,17 +52,37 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>4E62C4E8C5A8969487F338493B015570</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
 		<key>88E9EC28B8B46C3631E6B242B50F4442</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
+		<key>8E2D43B888B67CDD1D6B47B85F08C64C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9185BBF36844FB8364F37987C7E433B7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>969A2EEFD23EFA74B37612859AD2DA65</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9EFE4C70245EE2857D336B8B9FA4E825</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>C235F77E101E742652CCF98FFDFA5182</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>CD6C9FB6B052E1CF663F8A56041EA163</key>
 		<dict>
 			<key>primary</key>
 			<true/>

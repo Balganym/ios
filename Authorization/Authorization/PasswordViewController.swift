@@ -11,7 +11,7 @@ import NVActivityIndicatorView
 
 // MARK: - constants
 private struct Constants {
-    static let userInfoSegue = "Show User Info"
+    static let userInfoSegue = "Show Info"
 }
 
 class PasswordViewController: UIViewController, NVActivityIndicatorViewable {
@@ -57,6 +57,7 @@ class PasswordViewController: UIViewController, NVActivityIndicatorViewable {
                 if let message = message {
                     self.showAlert("Ошибка", message)
                 } else {
+                    Storage.user = user
                     self.performSegue(withIdentifier: Constants.userInfoSegue,
                                       sender: user!)
                 }
@@ -68,8 +69,7 @@ class PasswordViewController: UIViewController, NVActivityIndicatorViewable {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier! {
         case Constants.userInfoSegue:
-            let destinationVC = segue.destination as! TokenViewController
-            destinationVC.user = sender as! User
+            let destinationVC = segue.destination as! UINavigationController
         default: break
         }
     }

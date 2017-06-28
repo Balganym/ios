@@ -5,4 +5,7 @@ target 'Authorization' do
 	pod 'Alamofire', '~> 4.4'
 	pod 'NVActivityIndicatorView'
 	pod 'IQKeyboardManagerSwift'
+	pod 'ObjectMapper', '~> 2.2'
+	pod 'Cache', '~> 3.3'
+	pod 'AlamofireImage', '~> 3.2'
 end

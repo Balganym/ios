@@ -20,26 +20,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.sharedManager().enable = true
         IQKeyboardManager.sharedManager().shouldResignOnTouchOutside = true
         
-        if let curUser = UserDefaults.standard.dictionary(forKey: "curUser") {
-            openView("TokenView")
-            user = User(from: curUser)
-        }
+        openView()
         
         // Override point for customization after application launch.
         return true
     }
     
-    func isThereUser() -> User?{
-        return user
-    }
-    
-    func openView(_ path: String) {
-        switch path {
-            case "tokenView":
-                window?.rootViewController = UIStoryboard(name: "Authorization", bundle: nil).instantiateViewController(withIdentifier: "token")
-            case "emailView":
-                window?.rootViewController = UIStoryboard(name: "Authorization", bundle: nil).instantiateViewController(withIdentifier: "mainView")
-            default: break
+    func openView() {
+        if Storage.user != nil {
+            window?.rootViewController = Storyboard.userInfoNC
+        } else {
+            window?.rootViewController = Storyboard.authorizationNC
         }
     }
     
